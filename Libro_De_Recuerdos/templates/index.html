@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Libro de Recuerdos</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background: #f5f0e1;
+            margin: 0;
+            padding: 20px;
+        }
+        .libro {
+            max-width: 900px;
+            margin: auto;
+            background: #fff8dc;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #5a3921;
+        }
+        .formulario {
+            margin-bottom: 40px;
+            background: #fff3e0;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        input, textarea, button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            font-family: 'Georgia', serif;
+            font-size: 1em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .pagina {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .recuerdo {
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        img, video {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .descripcion {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #333;
+        }
+        .paginacion {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .paginacion a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #5a3921;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="libro">
+    <h1>Mi Libro de Recuerdos</h1>
+
+    <form action="{{ url_for('subir') }}" method="post" enctype="multipart/form-data" class="formulario">
+        <input type="text" name="nombre" placeholder="Título del Recuerdo" required>
+        <input type="date" name="fecha" required>
+        <textarea name="descripcion" placeholder="Descripción del recuerdo" rows="3" required></textarea>
+        <input type="file" name="archivo" accept="image/,video/" required>
+        <button type="submit">Guardar Recuerdo</button>
+    </form>
+
+    <div class="pagina">
+        {% for recuerdo in recuerdos %}
+        <div class="recuerdo">
+            <h3>{{ recuerdo.nombre }}</h3>
+            <p><strong>{{ recuerdo.fecha }}</strong></p>
+
+            {% if recuerdo.tipo == 'imagen' %}
+            <img src="{{ url_for('static', filename='uploads/' + recuerdo.archivo) }}" alt="Recuerdo">
+            {% else %}
+            <video controls>
+                <source src="{{ url_for('static', filename='uploads/' + recuerdo.archivo) }}" type="video/mp4">
+                Tu navegador no soporta el video.
+            </video>
+            {% endif %}
+            
+            <div class="descripcion">{{ recuerdo.descripcion }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="paginacion">
+        {% if pagina_actual > 1 %}
+        <a href="{{ url_for('index', pagina=pagina_actual-1) }}">&#8592; Página anterior</a>
+        {% endif %}
+        
+        {% if pagina_actual < total_paginas %}
+        <a href="{{ url_for('index', pagina=pagina_actual+1) }}">Página siguiente &#8594;</a>
+        {% endif %}
+    </div>
+
+</div>
+
+</body>
+</html>
